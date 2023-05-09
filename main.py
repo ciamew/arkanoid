@@ -17,7 +17,12 @@ movement = [1*d,1*d]
 colors = ["red", "orange", "yellow","green","blue","purple","pink","white","turquoise"]
 ball = canvas.create_oval(w/2-20,h/2-20,w/2,h/2, fill=random.choice(colors))
 
-
+bricks = []
+for i in range(0,5):
+    for s in range(1,6):
+        for u in range(0,10):
+            for n in range(1,11):
+                bricks.append(canvas.create_rectangle(75*u ,30*i ,75*n ,30*s, outline="black",fill=random.choice(colors)))
 def move():
     global movement
     canvas.move(ball,movement[0],movement[1])
