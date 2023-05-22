@@ -1,4 +1,3 @@
-
 import tkinter as tk
 import random
 
@@ -13,33 +12,26 @@ h = 450
 canvas = tk.Canvas(width = w, height = h, bg = "white")
 canvas.pack()
 
+text_start = canvas.create_text(w//2, h//2 - 70, text="START THE GAME BY CLICKING \n              ON THE PADDLE")
+
 d=15
-movement = [1*d,1*d]
+movement = [-1*d,-1*d]
 
 colors = ["red", "purple", "orange","yellow","blue","green","brown","magenta","turquoise"]
-ball = canvas.create_oval(w/2-20,h/2-20,w/2,h/2, fill=random.choice(colors))
+ball = canvas.create_oval(w/2-10,h/2-10,w/2+10,h/2+10, fill=random.choice(colors))
 bricks_colors = ["black","darkblue","blue","turquoise"]
 
 paddle = canvas.create_rectangle(w/2-50, h-80, w/2+50, h-60, fill="black")
-# bar = canvas.create_rectangle(0,h,w,h,outline="red")
-# barr = canvas.create_polygon(0,h, 5,440, 10,h, 15,440, 20,h, 25,440, 30,h, 35,440,40,h,45,440,50,h,55,440,60,h,65,440,70,h,75,440,80,h,85,440,90,h,95,440,100,h,105,440,110,h,115,440,120,h,0,h)
 
-# for q in range(65):
-#     for bw in range(0, 130, 5):
-#         for bh in range(h, 440):
-#             canvas.create_polygon(bw,bh,bw)
-#
-# for bw in range(0,130,5):
-#     for bh in range (h,440):
-#         canvas.create_rectangle()
+bar = canvas.create_rectangle(0,h,w,h,outline="red")
+for q in range(0,66):  #vytvori spodne trojuholniky
+    canvas.create_polygon(10*q,450,5+(10*q),440,10*(q+1),450,outline="red",fill="red")
 
-
-for q in range(0,64):
-    for e in range(1,65):
-        for bw1 in range(10):
-            for bw2 in range(5): #5+10*e
-                canvas.create_polygon(bw1*q,h,bw2+10*e,440)
-
+canvas.create_text(67,350,text="BALL SPEED",fill="darkblue",font="Arial 7")
+speed_up_rect = canvas.create_rectangle(40,370,64,394,outline="white")
+speed_up_plus = canvas.create_polygon(48,370,56,370,56,378,64,378,64,386,56,386,56,386,56,394,48,394,48,386,40,386,40,378,48,378,fill="darkblue",outline="darkblue")
+speed_down_rect = canvas.create_rectangle(70,370,94,394,outline="white")
+speed_down_minus = canvas.create_rectangle(70,378,94,386,fill="darkblue",outline="darkblue")
 
 bricks_w = 65
 bricks_h = 20
@@ -64,9 +56,10 @@ def destroybrick():
     print(items_list)
     for i in items_list:
         if i in bricks:
+            movement = [movement[0] * -1, movement[1] * -1]
             bricks.remove(i)
             canvas.delete(i)
-            movement = [movement[0] * -1, movement[1] * -1]
+            # movement = [movement[0] * -1, movement[1] * -1]
 #    canvas.after(25,destroybrick)
 
 
@@ -77,18 +70,19 @@ def ball_move():
     paddle_pos = canvas.coords(paddle)
     overlap = canvas.find_overlapping(paddle_pos[0], paddle_pos[1], paddle_pos[2], paddle_pos[3])
     destroybrick()
+    canvas.after(50, ball_move)
     if canvas.coords(ball)[0] < 0:
         movement[0] *= (-1)
     if canvas.coords(ball)[1] < 0:
         movement[1] *= (-1)
     if canvas.coords(ball)[2] > w:
         movement[0] *= (-1)
-    if canvas.coords(ball)[3] > h:
+    if canvas.coords(ball)[3] > (h-10):
         canvas.delete("all")
-        canvas.create_text(w/2, h/2, text="YOU LOST", fill="red", font="Arial 15")
+        canvas.create_text(w/2, h/2, text="                     YOU LOST \n TRY AGAIN BY CLICKING ON XXX", fill="red", font="Arial 9")
     if ball in overlap:
         movement = bounce(canvas.coords(ball), paddle_pos)
-    canvas.after(50, ball_move)
+    # canvas.after(100, ball_move)
 
 paddle_width = 50
 def bounce(ball_pos, paddle_pos):
@@ -98,11 +92,13 @@ def bounce(ball_pos, paddle_pos):
     return [ball_to_rec//(paddle_width//3), -1]
 
 def starter(e):
-    global x
-    zoz = canvas.find_overlapping(e.x, e.y, e.x+1, e.y+1)
-    if paddle in zoz:
+    global x, y
+    click = canvas.find_overlapping(e.x, e.y, e.x+1, e.y+1)
+    if paddle in click:
         x = e.x
+        y = e.y
         ball_move()
+        canvas.delete(text_start)
 
 def mover(e):
     global x
@@ -111,6 +107,7 @@ def mover(e):
         canvas.move(paddle, mouse, 0)
         x = e.x
 
+
 # def moverarrow(j):
 #     global x
 #     if x != 0:
@@ -118,6 +115,8 @@ def mover(e):
 #         canvas.move(paddle, arrow, 0)
 #         x = e.x
 
+# def speed():
+#     canvas.after(50,ball_move)
 
 def checkkey(s):
     print("Stlacila som")
@@ -125,8 +124,10 @@ def checkkey(s):
 
 canvas.bind("<Button-1>", starter)
 canvas.bind("<B1-Motion>", mover)
+# canvas.bind("<Button-1>", speedup)
+
 win.bind("<Key>",checkkey)
-win.bind("<Up>",checkkey)
+# win.bind("<Up>",speed)
 win.bind("<Down>",checkkey)
 win.bind("<Right>",checkkey)
 win.bind("<Left>",checkkey)
